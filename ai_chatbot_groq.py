@@ -1,7 +1,19 @@
 import streamlit as st
 from groq import Groq
+import os
 
-client = Groq(api_key="API")
+# Get API key securely
+try:
+    api_key = st.secrets["GROQ_API_KEY"]
+except (KeyError, FileNotFoundError):
+    api_key = os.getenv("GROQ_API_KEY")
+
+if not api_key:
+    st.error("⚠️ GROQ_API_KEY not found!")
+    st.info("Please add your Groq API key in Streamlit secrets.")
+    st.stop()
+
+client = Groq(api_key=api_key)
 
 st.set_page_config(
     page_title=" 🤖 Q&A Chatbot ",
@@ -26,28 +38,28 @@ if question:
     )
     with st.chat_message("user"):
         st.markdown(question)
-
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are a factual Q&A assistant. "
-                    "Give clear and concise answers. "
-                    "If you do not know the answer, say 'I don't know'. "
-                    "Do not hallucinate."
-                )
-            },
-            *st.session_state.messages
-        ],
-        temperature=0.2
-    )
-
-    answer = response.choices[0].message.content
-
-    st.session_state.messages.append(
-        {"role": "assistant", "content": answer}
-    )
-    with st.chat_message("assistant"):
-        st.markdown(answer)
+    
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a factual Q&A assistant. "
+                        "Give clear and concise answers. "
+                        "If you do not know the answer, say 'I don't know'. "
+                        "Do not hallucinate."
+                    )
+                },
+                *st.session_state.messages
+            ],
+            temperature=0.2
+        )
+        answer = response.choices[0].message.content
+        st.session_state.messages.append(
+            {"role": "assistant", "content": answer}
+        )
+        with st.chat_message("assistant"):
+            st.markdown(answer)
+    exce
