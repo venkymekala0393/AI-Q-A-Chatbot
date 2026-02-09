@@ -62,4 +62,5 @@ if question:
         )
         with st.chat_message("assistant"):
             st.markdown(answer)
-    exce
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
