@@ -41,7 +41,7 @@ if question:
     
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="meta-llama/llama-prompt-guard-2-86m",
             messages=[
                 {
                     "role": "system",
@@ -64,4 +64,5 @@ if question:
             st.markdown(answer)
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
+
 
